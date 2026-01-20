@@ -42,6 +42,11 @@ def main():
         # Initialize video writer (for recording video)
         fourcc = cv2.VideoWriter_fourcc(*'XVID')  # Codec for .avi format
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Ensure the 'data/videos' directory exists
+        if not os.path.exists('data/videos'):
+            os.makedirs('data/videos')
+
         video_filename = f"data/videos/{timestamp}_video.avi"  # Video filename with timestamp
         out = None  # Start with no video writer
 
