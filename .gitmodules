@@ -1,0 +1,3 @@
+[submodule "external/oak-examples"]
+	path = external/oak-examples
+	url = https://github.com/luxonis/oak-examples
