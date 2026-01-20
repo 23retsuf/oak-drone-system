@@ -1,40 +1,13 @@
-"""
-view_rgb.py
-========================
-
-Phase: 1 – Basic RGB Visualization
-
-Description:
-------------
-This script connects to an OAK-D / OAK-D Pro camera and displays
-the RGB camera stream in a window using OpenCV.
-
-Scope (what this script DOES):
-------------------------------
-- Initialize a minimal DepthAI pipeline
-- Capture RGB frames from the OAK camera
-- Display the frames on screen in real time
-
-Out of scope (what this script DOES NOT do):
--------------------------------------------
-- Save images
-- Record video
-- Stream video over network
-- Use depth, IR or AI
-- Interact with Raspberry Pi, GCS or MAVLink
-
-This script is intentionally minimal and serves as the foundation
-for later phases of the project.
-"""
-
 import depthai as dai
 import cv2
-
+import os
+from datetime import datetime
 
 def main():
     """
     Main execution function.
     Creates the pipeline, starts the device and displays RGB frames.
+    Also captures images when the 'c' key is pressed.
     """
 
     # ----------------------------
@@ -64,7 +37,7 @@ def main():
             blocking=False
         )
 
-        print("OAK-D RGB stream started. Press 'q' to quit.")
+        print("OAK-D RGB stream started. Press 'q' to quit and 'c' to capture image.")
 
         # ----------------------------
         # Main loop
@@ -75,10 +48,30 @@ def main():
 
             cv2.imshow("OAK-D RGB", frame)
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'):
                 break
+            if key == ord('c'):  # Press 'c' to capture image
+                capture_image(frame)
 
     cv2.destroyAllWindows()
+
+
+def capture_image(frame):
+    """
+    Function to capture and save an image with a timestamp.
+    """
+    # Create the images directory if it doesn't exist
+    if not os.path.exists('data/images'):
+        os.makedirs('data/images')
+
+    # Generate a filename based on the current timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"data/images/{timestamp}.jpg"
+
+    # Save the frame as an image
+    cv2.imwrite(filename, frame)
+    print(f"Image captured and saved as {filename}")
 
 
 if __name__ == "__main__":
