@@ -7,7 +7,7 @@ def main():
     """
     Main execution function.
     Creates the pipeline, starts the device and displays RGB frames.
-    Also captures images when the 'c' key is pressed.
+    Also captures images when the 'c' key is pressed and records video when 'r' is pressed.
     """
 
     # ----------------------------
@@ -37,7 +37,13 @@ def main():
             blocking=False
         )
 
-        print("OAK-D RGB stream started. Press 'q' to quit and 'c' to capture image.")
+        print("OAK-D RGB stream started. Press 'q' to quit, 'c' to capture image, 'r' to record video.")
+
+        # Initialize video writer (for recording video)
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')  # Codec for .avi format
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        video_filename = f"data/videos/{timestamp}_video.avi"  # Video filename with timestamp
+        out = None  # Start with no video writer
 
         # ----------------------------
         # Main loop
@@ -49,10 +55,27 @@ def main():
             cv2.imshow("OAK-D RGB", frame)
 
             key = cv2.waitKey(1) & 0xFF
+
             if key == ord('q'):
                 break
             if key == ord('c'):  # Press 'c' to capture image
                 capture_image(frame)
+            if key == ord('r'):  # Press 'r' to start/stop recording video
+                if out is None:  # If not recording, start recording
+                    out = cv2.VideoWriter(video_filename, fourcc, 30.0, (640, 480))
+                    print(f"Recording started: {video_filename}")
+                else:  # If recording, stop recording
+                    out.release()
+                    print(f"Video saved as {video_filename}")
+                    out = None  # Reset video writer
+
+            # If recording, write the current frame to the video file
+            if out is not None:
+                out.write(frame)
+
+        # Release the video writer object when done
+        if out is not None:
+            out.release()
 
     cv2.destroyAllWindows()
 
